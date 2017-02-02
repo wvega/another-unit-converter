@@ -19,8 +19,9 @@ class Another_Unit_Converter_Plugin {
 
     private $currency_parser;
 
-    public function __construct( $currency_parser ) {
+    public function __construct( $currency_parser, $currency_conversion ) {
         $this->currency_parser = $currency_parser;
+        $this->currency_conversion = $currency_conversion;
     }
 
     public function plugins_loaded() {
@@ -131,7 +132,8 @@ class Another_Unit_Converter_Plugin {
 
 function aucp_load_another_unit_converter_plugin() {
     $plugin = new Another_Unit_Converter_Plugin(
-        new AUCP_Currency_Parser( new AUCP_Currencies() )
+        new AUCP_Currency_Parser( new AUCP_Currencies() ),
+        new AUCP_Currency_Conversion()
     );
 
     $plugin->plugins_loaded();
