@@ -27,6 +27,13 @@ class Another_Unit_Converter_Plugin {
     public function plugins_loaded() {
         add_action( 'init', array( $this, 'init' ) );
         add_action( 'template_redirect', array( $this, 'frontend_init' ) );
+
+        add_action( 'wp_ajax_aucp_get_rates', array( $this, 'ajax_get_rates' ) );
+        add_action( 'wp_ajax_nopriv_aucp_get_rates', array( $this,'ajax_get_rates' ) );
+        add_action( 'wp_ajax_aucp_convert', array( $this, 'ajax_convert' ) );
+        add_action( 'wp_ajax_nopriv_aucp_convert', array( $this,'ajax_convert' ) );
+        add_action( 'wp_ajax_aucp_batch_convert', array( $this, 'ajax_batch_convert' ) );
+        add_action( 'wp_ajax_nopriv_aucp_batch_convert', array( $this,'ajax_batch_convert' ) );
     }
 
     public function init() {
@@ -127,6 +134,86 @@ class Another_Unit_Converter_Plugin {
         }
 
         return $currency_amounts;
+    }
+
+    public function ajax_get_rates() {
+        $response = array( 'success' => false );
+        $codes = array();
+
+        foreach ( array( 'code', 'codes' ) as $id ) {
+            if ( ! empty( $_REQUEST[ $id ] ) ) {
+                foreach ( (array) $_REQUEST[ $id ] as $code ) {
+                    $codes = array_merge( $codes, explode( ',', $code ) );
+                }
+            }
+        }
+        $codes = array_map( 'strtoupper', $codes );
+        $all_rates = $this->currency_conversion->get_rates();
+
+        $response['success'] = true;
+
+        if ( ! $codes )
+            $response['rates'] = $all_rates;
+        else
+            $response['rates'] = wp_array_slice_assoc( $all_rates, $codes );
+
+        echo json_encode( $response );
+        exit;
+    }
+
+    public function ajax_convert() {
+        $response = array( 'success' => false );
+
+        $from = ! empty( $_REQUEST['from'] ) ? trim( $_REQUEST['from'] ) : '';
+        $to = ! empty( $_REQUEST['to'] ) ? trim( $_REQUEST['to'] ) : '';
+        $amount = ! empty( $_REQUEST['amount'] ) ? floatval( $_REQUEST['amount'] ) : '';
+
+        $conversion = $this->currency_conversion->convert( $from, $to, $amount );
+
+        if ( false !== $conversion ) {
+            $response['success'] = true;
+            $response['from'] = $from;
+            $response['to'] = $to;
+            $response['amount'] = $amount;
+            $response['result'] = $conversion;
+            $response['rate'] = $this->currency_conversion->convert( $from, $to, 1.0 );
+        }
+
+        echo json_encode( $response );
+        exit;
+    }
+
+    public function ajax_batch_convert() {
+        $response = array( 'success' => false );
+
+        if ( isset( $_REQUEST['items'] ) && is_array( $_REQUEST['items'] ) ) {
+            $response['success'] = true;
+            $response['results'] = array();
+
+            foreach ( $_REQUEST['items'] as $item ) {
+                $from = ! empty( $item['from'] ) ? strtoupper( $item['from'] ) : '';
+                $to = ! empty( $item['to'] ) ? strtoupper( $item['to'] ) : '';
+                $amount = isset( $item['amount'] ) ? $item['amount'] : '';
+
+                $result_item = array(
+                    'from'    => $from,
+                    'to'      => $to,
+                    'amount'  => $amount,
+                    'success' => false
+                );
+
+                if ( $result = $this->currency_conversion->convert( $from, $to, $amount ) ) {
+                    $result_item['success'] = true;
+                    $result_item['result'] = $result;
+                    $result_item['rate'] = $this->currency_conversion->convert( $from, $to, 1.0 );
+                }
+
+                $response[] = $result_item;
+            }
+        }
+
+        echo json_encode( $response );
+        exit;
     }
 }
 
