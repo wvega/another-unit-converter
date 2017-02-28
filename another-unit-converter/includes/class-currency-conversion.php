@@ -55,7 +55,7 @@ class AUCP_Currency_Conversion {
         return ( 1.0 / $from_rate ) * $to_rate * floatval( $amount );
     }
 
-    private function maybe_refresh_rates( $force_refresh = false ) {
+    private function maybe_refresh_rates() {
         $exchange_rates = get_transient( 'aucp-exchange-rates' );
 
         if ( ! $exchange_rates ) {
