@@ -130,7 +130,7 @@ if ( typeof jQuery !== 'undefined' ) {
             });
 
             // If there's a default target currency, perform conversion.
-            if ( aucp_js.default_target_currency ) {
+            if ( aucp_js.default_target_currency && aucp_js.is_external_api_set) {
                 aucp_convert_amounts( aucp_js.default_target_currency );
             }
         });

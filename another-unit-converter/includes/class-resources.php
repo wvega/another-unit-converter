@@ -29,7 +29,8 @@ class AUCP_Resources {
             'aucp_js',
             array( 
                 'ajaxurl' => admin_url( 'admin-ajax.php' ),
-                'default_target_currency' => AUCP()->get_default_target_currency()
+                'default_target_currency' => AUCP()->get_default_target_currency(),
+                'is_external_api_set' => AUCP()->is_external_currency_conversion_api_ready()
             )
         );
     }

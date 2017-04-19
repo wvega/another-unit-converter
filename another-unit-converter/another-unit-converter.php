@@ -90,7 +90,7 @@ class Another_Unit_Converter_Plugin {
         add_filter( 'the_content', array( $this, 'format_currency_amounts' ) );
     }
 
-    private function is_external_currency_conversion_api_ready() {
+    public function is_external_currency_conversion_api_ready() {
         $api_key = $this->settings->get_option( 'currencylayer_key' );
         return ! empty( $api_key );
     }
