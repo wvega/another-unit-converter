@@ -80,6 +80,10 @@ class Another_Unit_Converter_Plugin {
         $this->currency_conversion->maybe_refresh_rates();
 
         add_filter( 'the_content', array( $this, 'format_currency_amounts' ) );
+
+        if( class_exists( 'WooCommerce' ) ){
+            add_filter( 'wc_price', array( $this, 'format_woocommerce_currency_amounts' ), 10, 4 );
+        }
     }
 
     public function is_external_currency_conversion_api_ready() {
@@ -127,7 +131,7 @@ class Another_Unit_Converter_Plugin {
 
         foreach ( $currency_amounts as $index => $currency_amount ) {
             $currency_info = $this->select_currency( $currency_amount['currencies'] );
-
+            
             $start_position = $currency_info['position']['start'] + $offset;
             $end_position = $currency_info['position']['end'] + $offset;
 
@@ -159,6 +163,13 @@ class Another_Unit_Converter_Plugin {
 
         wp_enqueue_script( 'another-unit-converter-frontend' );
 
+        return $content;
+    }
+
+    public function format_woocommerce_currency_amounts( $return, $price, $args, $unformatted_price ){
+
+        $content = $this->format_currency_amounts( html_entity_decode( get_woocommerce_currency_symbol( ) ) . $price );
+        
         return $content;
     }
 

@@ -3,3 +3,4 @@
 .vagrant/
 node_modules/
 vendor/
+_vvv/

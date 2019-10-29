@@ -9,7 +9,7 @@ class AUCP_Currency_Parser {
     }
 
     public function get_currency_amounts( $content ) {
-        $regexp = '/(*UTF8)(?<currency_amount>\d{4,}|\d{1,3}(?:[,. ]\d{1,3})*)/';
+        $regexp = '/(*UTF8)(?<currency_amount>(\d{4,}|\d{1,3})(?:[,. ]\d{1,3})*)/';
 
         if ( ! preg_match_all( $regexp, $content, $matches, PREG_OFFSET_CAPTURE ) ) {
             return array();

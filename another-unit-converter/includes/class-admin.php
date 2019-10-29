@@ -68,7 +68,7 @@ class AUCP_Admin {
         $on_plugins_page  = 'plugins.php' == $pagenow;
 
         if ( $on_settings_page ) {
-            echo '<div class="notice notice-warning"><p>';
+            echo '<div class="notice notice-warning is-dismissible"><p>';
 
             _e( '<strong>Another Unit Converter</strong> requires a <strong>currencylayer API key</strong> to work properly. Obtaining an API key from currencylayer is completely FREE.', 'another-unit-converter' );
             echo '<br /><br />';
